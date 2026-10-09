@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chapter02.SupplyChainMapper">
+
+    <resultMap id="spcMap" type="com.entity.SupplierProductCustomer">
+        <result column="supplier_name"   property="supplierName"/>
+        <result column="contact_name"    property="contactName"/>
+        <result column="product_name"    property="productName"/>
+        <result column="product_code"    property="productCode"/>
+        <result column="goods_name"      property="goodsName"/>
+        <result column="sku"             property="sku"/>
+        <result column="specification"   property="specification"/>
+        <result column="customer_name"   property="customerName"/>
+        <result column="customer_phone"  property="customerPhone"/>
+        <result column="quantity"        property="quantity"/>
+        <result column="unit_price"      property="unitPrice"/>
+        <result column="sale_date"       property="saleDate"/>
+    </resultMap>
+
+    <select id="findBySupplierIdAndProductCode" resultMap="spcMap">
+        SELECT s.supplier_name, s.contact_name,
+               p.product_name, p.product_code,
+               g.goods_name, g.sku, g.specification,
+               c.customer_name, c.phone AS customer_phone,
+               si.quantity, si.unit_price, sa.sale_date
+        FROM supplier s
+        JOIN product p        ON s.id = p.supplier_id
+        JOIN product_goods pg ON p.id = pg.product_id
+        JOIN goods g          ON pg.goods_id = g.id
+        JOIN sale_item si     ON g.id = si.goods_id
+        JOIN sale sa          ON si.sale_id = sa.id
+        JOIN customer c       ON sa.customer_id = c.id
+        WHERE s.id = #{supplierId}
+        AND p.product_code = #{productCode}
+        ORDER BY c.id
+    </select>
+
+    <select id="findByCustomerAndGoodsPriceRange" resultMap="spcMap">
+        SELECT s.supplier_name, s.contact_name,
+               p.product_name, p.product_code,
+               g.goods_name, g.sku, g.specification,
+               c.customer_name, c.phone AS customer_phone,
+               si.quantity, si.unit_price, sa.sale_date
+        FROM customer c
+        JOIN sale sa         ON c.id = sa.customer_id
+        JOIN sale_item si    ON sa.id = si.sale_id
+        JOIN goods g         ON si.goods_id = g.id
+        JOIN product_goods pg ON g.id = pg.goods_id
+        JOIN product p       ON pg.product_id = p.id
+        JOIN supplier s      ON p.supplier_id = s.id
+        WHERE c.customer_name LIKE CONCAT('%', #{customerName}, '%')
+        AND g.price &gt;= #{minPrice}
+        AND g.price &lt;= #{maxPrice}
+        ORDER BY c.id, g.price
+    </select>
+
+    <select id="findBySupplierProductAndDate" resultMap="spcMap">
+        SELECT s.supplier_name, s.contact_name,
+               p.product_name, p.product_code,
+               g.goods_name, g.sku, g.specification,
+               c.customer_name, c.phone AS customer_phone,
+               si.quantity, si.unit_price, sa.sale_date
+        FROM supplier s
+        JOIN product p        ON s.id = p.supplier_id
+        JOIN product_goods pg ON p.id = pg.product_id
+        JOIN goods g          ON pg.goods_id = g.id
+        JOIN sale_item si     ON g.id = si.goods_id
+        JOIN sale sa          ON si.sale_id = sa.id
+        JOIN customer c       ON sa.customer_id = c.id
+        WHERE s.id = #{supplierId}
+        AND p.product_name LIKE CONCAT('%', #{productName}, '%')
+        AND sa.sale_date &gt;= #{startDate}
+        AND sa.sale_date &lt;= #{endDate}
+        ORDER BY sa.sale_date DESC
+    </select>
+
+</mapper>

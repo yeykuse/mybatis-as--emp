@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chapter01.CategoryMapper">
+
+    <resultMap id="categoryResultMap" type="com.entity.Category">
+        <id property="id" column="id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="description" column="description"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findByMap" parameterType="Map" resultMap="categoryResultMap">
+        SELECT * FROM category WHERE 1=1
+        <if test="categoryName != null">
+            AND category_name LIKE CONCAT('%', #{categoryName}, '%')
+        </if>
+        <if test="parentId != null">
+            AND parent_id = #{parentId}
+        </if>
+    </select>
+
+    <select id="findProductsByCategoryId" resultType="com.entity.Product">
+        SELECT p.* FROM product p
+        INNER JOIN product_category pc ON p.id = pc.product_id
+        WHERE pc.category_id = #{categoryId}
+    </select>
+
+    <insert id="insertCategory" parameterType="com.entity.Category" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO category (category_name, parent_id, sort_order, description)
+        VALUES (#{category.categoryName}, #{category.parentId}, #{category.sortOrder}, #{category.description})
+    </insert>
+
+    <update id="updateCategory" parameterType="com.entity.Category">
+        UPDATE category
+        <set>
+            <if test="category.categoryName != null">category_name = #{category.categoryName},</if>
+            <if test="category.parentId != null">parent_id = #{category.parentId},</if>
+            <if test="category.sortOrder != null">sort_order = #{category.sortOrder},</if>
+            <if test="category.description != null">description = #{category.description},</if>
+        </set>
+        WHERE id = #{category.id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM category WHERE id = #{id}
+    </delete>
+
+</mapper>

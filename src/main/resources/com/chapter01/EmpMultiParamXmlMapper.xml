@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  XML方式 - 多参数查询映射文件
+  
+  当方法有多个参数且都用 @Param 注解命名后，在 XML 的 SQL 语句中
+  直接用 #{paramName} 引用对应的参数值即可，无需配置 parameterType
+-->
+<mapper namespace="com.chapter01.EmpMultiParamXmlMapper">
+
+    <!--
+      【多参数1】按职位和部门编号查询
+      
+      两个参数：job（职位）和 deptno（部门编号）
+      SQL 中通过 #{job} 和 #{deptno} 引用
+      
+      参数传递过程：
+        Java 调用: findByJobAndDeptnoXml("SALESMAN", 30)
+        SQL 执行:  SELECT * FROM emp WHERE job = 'SALESMAN' AND deptno = 30
+    -->
+    <select id="findByJobAndDeptnoXml" resultType="com.entity.Emp">
+        SELECT * FROM emp WHERE job = #{job} AND deptno = #{deptno}
+    </select>
+
+    <!--
+      【多参数2】按薪资范围查询
+      
+      两个参数：minSal（最低薪资）和 maxSal（最高薪资）
+      使用 >= 和 <= 做范围查询
+      
+      参数传递过程：
+        Java 调用: findBySalRangeXml(new BigDecimal("3000"), new BigDecimal("5000"))
+        SQL 执行:  SELECT * FROM emp WHERE sal >= 3000 AND sal <= 5000
+    -->
+    <select id="findBySalRangeXml" resultType="com.entity.Emp">
+        SELECT * FROM emp WHERE sal &gt;= #{minSal} AND sal &lt;= #{maxSal}
+    </select>
+
+    <!--
+      【多参数3】按姓名模糊查询 + 职位精确匹配
+      
+      两个参数：ename（姓名，模糊查询）和 job（职位，精确匹配）
+      LIKE CONCAT 用于拼接模糊查询条件，防止 SQL 注入
+      
+      参数传递过程：
+        Java 调用: findByEnameAndJobXml("张", "经理")
+        SQL 执行:  SELECT * FROM emp WHERE ename LIKE '%张%' AND job = '经理'
+    -->
+    <select id="findByEnameAndJobXml" resultType="com.entity.Emp">
+        SELECT * FROM emp WHERE ename LIKE CONCAT('%', #{ename}, '%') AND job = #{job}
+    </select>
+
+</mapper>
