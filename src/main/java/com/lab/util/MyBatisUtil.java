@@ -1,9 +1,10 @@
-﻿package com.lab.util;
+package com.lab.util;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import com.baomidou.mybatisplus.core.MybatisSqlSessionFactoryBuilder;
+import com.lab.config.MybatisPlusConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +17,7 @@ public class MyBatisUtil {
         try {
             InputStream in = Resources.getResourceAsStream("mybatis-config.xml");
             FACTORY = new MybatisSqlSessionFactoryBuilder().build(in);
+            FACTORY.getConfiguration().addInterceptor(MybatisPlusConfig.mybatisPlusInterceptor());
         } catch (IOException e) {
             throw new RuntimeException("MyBatis 配置文件加载失败", e);
         }

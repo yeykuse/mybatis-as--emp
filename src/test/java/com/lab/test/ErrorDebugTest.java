@@ -1,4 +1,4 @@
-﻿package com.lab.test;
+package com.lab.test;
 
 import com.lab.entity.Emp;
 import com.lab.mapper.ErrorDemoMapper;

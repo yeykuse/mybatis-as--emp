@@ -17,3 +17,16 @@ INSERT INTO emp (emp_name, gender, dept, post, salary, hire_date, status) VALUES
 ('李娜', '女', '研发部', '前端工程师', 10000.00, '2024-08-15', 1),
 ('王强', '男', '市场部', '市场专员', 8000.00, '2023-03-10', 1),
 ('赵敏', '女', '人事部', '人事专员', 7500.00, '2022-06-20', 0);
+
+CREATE TABLE IF NOT EXISTS salgrade (
+    grade INT PRIMARY KEY AUTO_INCREMENT COMMENT '薪资等级',
+    losal DECIMAL(10,2) NOT NULL COMMENT '该等级最低薪资',
+    hisal DECIMAL(10,2) NOT NULL COMMENT '该等级最高薪资'
+);
+
+INSERT INTO salgrade (grade, losal, hisal) VALUES
+(1, 0, 5000),
+(2, 5001, 8000),
+(3, 8001, 12000),
+(4, 12001, 18000),
+(5, 18001, 99999);

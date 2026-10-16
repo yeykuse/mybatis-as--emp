@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+    "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lab.mapper.SalgradeMapper">
+
+    <sql id="allColumns">grade, losal, hisal</sql>
+
+    <resultMap id="salgradeMap" type="Salgrade">
+        <id property="grade" column="grade"/>
+        <result property="losal" column="losal"/>
+        <result property="hisal" column="hisal"/>
+    </resultMap>
+
+    <select id="selectAllXml" resultMap="salgradeMap">
+        SELECT <include refid="allColumns"/> FROM salgrade
+    </select>
+
+    <select id="selectByIdXml" parameterType="int" resultMap="salgradeMap">
+        SELECT <include refid="allColumns"/> FROM salgrade WHERE grade = #{grade}
+    </select>
+
+    <insert id="insertXml" parameterType="Salgrade"
+            useGeneratedKeys="true" keyProperty="grade">
+        INSERT INTO salgrade (losal, hisal)
+        VALUES (#{losal}, #{hisal})
+    </insert>
+
+    <update id="updateXml" parameterType="Salgrade">
+        UPDATE salgrade
+        SET losal = #{losal}, hisal = #{hisal}
+        WHERE grade = #{grade}
+    </update>
+
+    <delete id="deleteByIdXml" parameterType="int">
+        DELETE FROM salgrade WHERE grade = #{grade}
+    </delete>
+
+</mapper>

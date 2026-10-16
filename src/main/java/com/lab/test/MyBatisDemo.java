@@ -1,4 +1,4 @@
-﻿package com.lab.test;
+package com.lab.test;
 
 import com.lab.entity.Emp;
 import com.lab.mapper.EmpMapper;
@@ -16,7 +16,7 @@ public class MyBatisDemo {
         SqlSessionFactory factory = new MybatisSqlSessionFactoryBuilder().build(in);
         try (SqlSession session = factory.openSession()) {
             EmpMapper mapper = session.getMapper(EmpMapper.class);
-            List<Emp> list = mapper.selectAll();
+            List<Emp> list = mapper.selectAllXml();
             list.forEach(System.out::println);
         }
     }

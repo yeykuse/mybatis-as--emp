@@ -1,4 +1,4 @@
-﻿package com.lab.mapper;
+package com.lab.mapper;
 
 import com.lab.entity.Emp;
 

@@ -19,28 +19,28 @@
         emp_id, emp_name, gender, dept, post, salary, hire_date, status
     </sql>
 
-    <select id="selectAll" resultMap="empMap">
+    <select id="selectAllXml" resultMap="empMap">
         SELECT <include refid="allColumns"/> FROM emp
     </select>
 
-    <select id="selectById" parameterType="int" resultMap="empMap">
+    <select id="selectByIdXml" parameterType="int" resultMap="empMap">
         SELECT <include refid="allColumns"/> FROM emp WHERE emp_id = #{empId}
     </select>
 
-    <insert id="insert" parameterType="Emp"
+    <insert id="insertXml" parameterType="Emp"
             useGeneratedKeys="true" keyProperty="empId">
         INSERT INTO emp (emp_name, gender, dept, post, salary, hire_date, status)
         VALUES (#{empName}, #{gender}, #{dept}, #{post}, #{salary}, #{hireDate}, #{status})
     </insert>
 
-    <update id="update" parameterType="Emp">
+    <update id="updateXml" parameterType="Emp">
         UPDATE emp
         SET emp_name = #{empName}, gender = #{gender}, dept = #{dept},
             post = #{post}, salary = #{salary}, status = #{status}
         WHERE emp_id = #{empId}
     </update>
 
-    <delete id="deleteById" parameterType="int">
+    <delete id="deleteByIdXml" parameterType="int">
         DELETE FROM emp WHERE emp_id = #{empId}
     </delete>
 
@@ -108,6 +108,29 @@
                 </otherwise>
             </choose>
         </where>
+    </select>
+
+    <resultMap id="empSalgradeMap" type="EmpSalgradeVO">
+        <id property="empId" column="emp_id"/>
+        <result property="empName" column="emp_name"/>
+        <result property="gender" column="gender"/>
+        <result property="dept" column="dept"/>
+        <result property="post" column="post"/>
+        <result property="salary" column="salary"/>
+        <result property="hireDate" column="hire_date"/>
+        <result property="status" column="status"/>
+        <result property="grade" column="grade"/>
+        <result property="losal" column="losal"/>
+        <result property="hisal" column="hisal"/>
+    </resultMap>
+
+    <select id="selectEmpWithSalgradeXml" resultMap="empSalgradeMap">
+        SELECT e.emp_id, e.emp_name, e.gender, e.dept, e.post, e.salary,
+               e.hire_date, e.status, s.grade, s.losal, s.hisal
+        FROM emp e
+        INNER JOIN salgrade s ON e.salary BETWEEN s.losal AND s.hisal
+        WHERE e.status = 1
+        ORDER BY s.grade, e.salary DESC
     </select>
 
 </mapper>
