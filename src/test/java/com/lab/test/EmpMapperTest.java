@@ -1,8 +1,12 @@
 ﻿package com.lab.test;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lab.entity.Emp;
 import com.lab.mapper.EmpMapper;
 import com.lab.util.MyBatisUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
@@ -132,6 +136,90 @@ public class EmpMapperTest {
             Emp cond3 = new Emp();
             System.out.println("=== choose：无条件查全部 ===");
             mapper.selectByChoose(cond3).forEach(System.out::println);
+        }
+    }
+
+    @Test
+    public void testBaseMapperCRUD() {
+        try (SqlSession session = MyBatisUtil.openSession()) {
+            EmpMapper mapper = session.getMapper(EmpMapper.class);
+
+            System.out.println("=== BaseMapper：selectById ===");
+            Emp emp = mapper.selectById(1);
+            System.out.println(emp);
+
+            System.out.println("=== BaseMapper：selectList（全部） ===");
+            List<Emp> all = mapper.selectList(null);
+            all.forEach(System.out::println);
+
+            System.out.println("=== BaseMapper：updateById ===");
+            emp.setSalary(new BigDecimal("14000"));
+            int rows = mapper.updateById(emp);
+            session.commit();
+            org.junit.Assert.assertEquals(1, rows);
+
+            System.out.println("=== BaseMapper：deleteById ===");
+            int delRows = mapper.deleteById(10);
+            session.commit();
+            System.out.println("删除影响行数 = " + delRows);
+        }
+    }
+
+    @Test
+    public void testQueryWrapper() {
+        try (SqlSession session = MyBatisUtil.openSession()) {
+            EmpMapper mapper = session.getMapper(EmpMapper.class);
+
+            String name = "伟";
+            String gender = "男";
+            BigDecimal minSalary = new BigDecimal("8000");
+
+            QueryWrapper<Emp> wrapper = new QueryWrapper<>();
+            wrapper.like(StringUtils.isNotBlank(name), "emp_name", name)
+                   .eq(StringUtils.isNotBlank(gender), "gender", gender)
+                   .eq("status", 1)
+                   .ge(minSalary != null, "salary", minSalary)
+                   .orderByDesc("salary");
+
+            List<Emp> list = mapper.selectList(wrapper);
+            System.out.println("=== QueryWrapper 多条件查询 ===");
+            list.forEach(System.out::println);
+        }
+    }
+
+    @Test
+    public void testLambdaQueryWrapper() {
+        try (SqlSession session = MyBatisUtil.openSession()) {
+            EmpMapper mapper = session.getMapper(EmpMapper.class);
+
+            String name = "伟";
+
+            LambdaQueryWrapper<Emp> lw = new LambdaQueryWrapper<>();
+            lw.like(Emp::getEmpName, name)
+              .eq(Emp::getStatus, 1)
+              .orderByDesc(Emp::getSalary);
+
+            List<Emp> list = mapper.selectList(lw);
+            System.out.println("=== LambdaQueryWrapper 查询 ===");
+            list.forEach(System.out::println);
+        }
+    }
+
+    @Test
+    public void testPage() {
+        try (SqlSession session = MyBatisUtil.openSession()) {
+            EmpMapper mapper = session.getMapper(EmpMapper.class);
+
+            QueryWrapper<Emp> wrapper = new QueryWrapper<>();
+            wrapper.eq("status", 1).orderByDesc("salary");
+
+            Page<Emp> page = new Page<>(1, 3);
+            Page<Emp> result = mapper.selectPage(page, wrapper);
+
+            System.out.println("=== 分页查询：第1页，每页3条 ===");
+            System.out.println("总记录数 = " + result.getTotal());
+            System.out.println("总页数 = " + result.getPages());
+            result.getRecords().forEach(System.out::println);
         }
     }
 }
