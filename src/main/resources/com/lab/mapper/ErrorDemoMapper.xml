@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+    "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lab.mapper.ErrorDemoMapper">
+
+    <resultMap id="empMap" type="Emp">
+        <id property="empId" column="emp_id"/>
+        <result property="empName" column="emp_name"/>
+        <result property="gender" column="gender"/>
+        <result property="dept" column="dept"/>
+        <result property="post" column="post"/>
+        <result property="salary" column="salary"/>
+        <result property="hireDate" column="hire_date"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <sql id="allColumns">
+        emp_id, emp_name, gender, dept, post, salary, hire_date, status
+    </sql>
+
+    <!-- 错误1：参数名写错 #{empname}（应为 #{empName}）-->
+    <select id="selectAllWithError1" resultMap="empMap">
+        SELECT <include refid="allColumns"/> FROM emp
+        WHERE emp_name = #{empname}
+    </select>
+
+    <!-- 错误2：resultMap 中 column 写错字段名 emp_nme（应为 emp_name）-->
+    <resultMap id="empMapError2" type="Emp">
+        <id property="empId" column="emp_id"/>
+        <result property="empName" column="emp_nme"/>
+        <result property="gender" column="gender"/>
+        <result property="dept" column="dept"/>
+        <result property="post" column="post"/>
+        <result property="salary" column="salary"/>
+        <result property="hireDate" column="hire_date"/>
+        <result property="status" column="status"/>
+    </resultMap>
+    <select id="selectAllWithError2" resultMap="empMapError2">
+        SELECT <include refid="allColumns"/> FROM emp
+    </select>
+
+    <!-- 错误3：缺少 useGeneratedKeys 属性，插入后主键不回填 -->
+    <insert id="insertWithError3" parameterType="Emp">
+        INSERT INTO emp (emp_name, gender, dept, post, salary, hire_date, status)
+        VALUES (#{empName}, #{gender}, #{dept}, #{post}, #{salary}, #{hireDate}, #{status})
+    </insert>
+
+</mapper>

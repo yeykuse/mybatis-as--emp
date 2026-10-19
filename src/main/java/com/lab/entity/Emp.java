@@ -18,7 +18,7 @@ public class Emp {
     private BigDecimal salary;
     private Date hireDate;
 
-    @TableLogic
+    @TableLogic(value = "1", delval = "0")
     private Integer status;
 
     public Integer getEmpId() {
